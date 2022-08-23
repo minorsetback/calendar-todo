@@ -9,21 +9,27 @@ import { useParams } from "react-router-dom";
 import ListGroup from 'react-bootstrap/ListGroup';
 import { BsFillTrashFill } from "react-icons/bs";
 import { AiOutlineEdit } from "react-icons/ai"
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import Alert from 'react-bootstrap/Alert';
 
 const schema = yup.object({
     title: yup.string().required().min(5),
+    description: yup.string().required(),
+    timeStart: yup.string().required(),
+    timeEnd: yup.string().required(),
+    notification: yup.string().required()
 }).required();
 
 const Todos = () => {
     const { todos, addTodo, deleteTodo, editTodo } = useTodo()
     let { id } = useParams();
-    const [todoId, setTodoId] = useState();
+    const [todoId, setTodoId] = useState(null);
+    const [show, setShow] = useState(false);
+    const filteredTodo = todos.todo.todo.filter(item => item.date === id)
+
     const { register, handleSubmit, formState: { errors }, setValue, reset } = useForm({
         resolver: yupResolver(schema)
     });
-
-    const filteredTodo = todos.todo.todo.filter(item => item.date === id)
 
     const setEditId = (id) => {
         const todo = filteredTodo.filter(item => item.id === id)
@@ -31,15 +37,24 @@ const Todos = () => {
         setValue('description', todo[0].description);
         setValue('timeStart', todo[0].timeStart);
         setValue('timeEnd', todo[0].timeEnd);
+        setValue('notification', todo[0].notification);
         setValue('done', todo[0].done);
         setValue('date', todo[0].date);
         setTodoId(id)
     }
 
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setShow(false)
+        }, 3000);
+        return () => clearTimeout(timer);
+    }, [show]);
+
     const onSubmit = data => {
+        setShow(true)
         if (todoId) {
             editTodo(todoId, data)
-            setTodoId()
+            setTodoId(null)
         } else {
             addTodo(data)
         }
@@ -67,6 +82,10 @@ const Todos = () => {
                     <Form.Label>Time end</Form.Label>
                     <Form.Control {...register("timeEnd")} type='time' rows={3} />
                 </Form.Group>
+                <Form.Group className="mb-3">
+                    <Form.Label>Notification</Form.Label>
+                    <Form.Control {...register("notification")} type='time' rows={3} />
+                </Form.Group>
                 <Form.Group className="mb-3" controlId="formBasicCheckbox">
                     <Form.Check {...register("done")} type="checkbox" label="Done?" />
                 </Form.Group>
@@ -77,11 +96,14 @@ const Todos = () => {
                     {todoId ? "Edit Todo" : "Add ToDo"}
                 </Button>
             </Form>
+            <Alert variant="success" onClose={() => setShow(false)} dismissible style={{ display: show ? "block" : "none" }}>
+                <Alert.Heading>Done</Alert.Heading>
+            </Alert>
             {filteredTodo?.map((item) => {
                 return (
                     <ListGroup.Item key={item.id}
                         as="li"
-                        className={`d-flex justify-content-between align-items-start w-100 ${item.done ? "list-group-item-success" : "list-group-item-danger"}`}
+                        className={`d-flex mb-2 rounded justify-content-between align-items-start w-100 ${item.done ? "list-group-item-success" : "list-group-item-danger"}`}
                     >
                         <div className="ms-2 me-auto">
                             <div className="fw-bold" style={{ cursor: "pointer" }}>{item.title}</div>

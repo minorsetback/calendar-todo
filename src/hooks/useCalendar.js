@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { isSameDay, getDaysInMonth, add, isWithinInterval, startOfMonth, lastDayOfMonth, isToday, isWeekend, getMonth, getYear } from 'date-fns'
+import { isSameDay, getDaysInMonth, add, isWithinInterval, startOfMonth, lastDayOfMonth, isToday, isWeekend, getYear } from 'date-fns'
 
 
 const useCalendar = () => {
@@ -8,7 +8,7 @@ const useCalendar = () => {
     const [currentMonthOfCalendar, setCurrentMonthOfCalendar] = useState({})
     const [currentMonth, setCurrentMonth] = useState('')
     const [currentYear, setCurrentYear] = useState('')
-    const [selectedDay, setSelectedDay] = useState({});
+    const [selectedDay, setSelectedDay] = useState(new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()));
 
     const DAYS_IN_WEEK = 7;
 
@@ -36,7 +36,6 @@ const useCalendar = () => {
 
         function getWeeks(date, { firstDayOfWeek = 0 } = {}) {
             let days = getDays(date)
-            let daysInMonth = days.length
             let week = []
             let weeks = []
 
@@ -56,7 +55,6 @@ const useCalendar = () => {
                 const outsideDate = cloneDate(firstWeek[0])
                 outsideDate.setDate(firstWeek[0].getDate() - 1)
                 firstWeek.unshift(outsideDate)
-                daysInMonth++
             }
 
             const lastWeek = weeks[weeks.length - 1]
@@ -64,7 +62,6 @@ const useCalendar = () => {
                 const outsideDate = cloneDate(lastWeek[lastWeek.length - 1])
                 outsideDate.setDate(lastWeek[lastWeek.length - 1].getDate() + 1)
                 lastWeek.push(outsideDate)
-                daysInMonth++
             }
 
             let monthOfCalendar = weeks.map((week) => {
@@ -88,8 +85,8 @@ const useCalendar = () => {
 
     const selectDay = (date) => {
         let newCalendarMonth = [...currentMonthOfCalendar];
-        newCalendarMonth.map((week) => {
-            week.map((day) => {
+        newCalendarMonth.forEach((week) => {
+            week.forEach((day) => {
                 if (day.isSelected) {
                     day.isSelected = false;
                 }

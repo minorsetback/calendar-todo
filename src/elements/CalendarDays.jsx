@@ -29,7 +29,7 @@ const CalendarDays = ({ currentMonthOfCalendar, selectDay }) => {
                                             <div>
                                                 <ul>
                                                     {sort.map((item, index) => <li key={index} className={styles.tasks}>{item?.title}</li>)}
-                                                    <li style={{ display: sort.length > 1 ? "block" : "none" }} className={styles.count__todos}><span>And {sort.length} taskts</span></li>
+                                                    <li style={{ display: sort.length > 2 ? "block" : "none" }} className={styles.count__todos}><span>And {sort.length - 1} taskts</span></li>
                                                 </ul>
                                             </div>
                                         </span>
